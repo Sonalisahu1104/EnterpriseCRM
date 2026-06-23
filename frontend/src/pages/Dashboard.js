@@ -51,18 +51,22 @@ function Dashboard() {
   // -------------------------
   // FETCH LEADS (PROTECTED)
   // -------------------------
-  const fetchLeads = async () => {
-    try {
-      const res = await axios.get(https://crmproject-1.onrender.com/api/leads, {
+ const fetchLeads = async () => {
+  try {
+    const res = await axios.get(
+      "https://crmproject-1.onrender.com/api/leads",
+      {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
-      setLeads(res.data);
-    } catch (err) {
-      console.log("Leads error:", err);
-    }
-  };
+      }
+    );
+
+    setLeads(res.data);
+  } catch (err) {
+    console.log("Leads error:", err);
+  }
+};
 
   useEffect(() => {
     fetchStats();

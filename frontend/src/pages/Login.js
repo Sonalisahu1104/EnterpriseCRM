@@ -9,10 +9,13 @@ function Login({ setToken }) {
     e.preventDefault();
 
     try {
-      const res = await axios.post("https://crmproject-1.onrender.com/api/auth/login", ...), {
-        email,
-        password,
-      };
+      const res = await axios.post(
+        "https://crmproject-1.onrender.com/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
 
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
@@ -43,7 +46,9 @@ function Login({ setToken }) {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="btn btn-primary">Login</button>
+        <button className="btn btn-primary">
+          Login
+        </button>
       </form>
     </div>
   );
