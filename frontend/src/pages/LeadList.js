@@ -57,8 +57,9 @@ function LeadList({ leads }) {
   const convertToCustomer = async (id) => {
     try {
       await axios.post(
-        `http://localhost:5001/api/customers/convert/${id}`,
-        {},
+  `https://crmproject-1.onrender.com/api/customers/convert/${id}`,
+  {},
+);
         {
           headers: {
             Authorization: `Bearer ${token}`,

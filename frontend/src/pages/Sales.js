@@ -8,7 +8,7 @@ function Sales() {
   const token = localStorage.getItem("token");
 
   const fetchSales = async () => {
-    const res = await axios.get("http://localhost:5001/api/sales", {
+    const res = await axios.get("https://crmproject-1.onrender.com/api/sales", {
       headers: { Authorization: `Bearer ${token}` },
     });
     setSales(res.data);
@@ -16,7 +16,7 @@ function Sales() {
 
   const fetchRevenue = async () => {
     const res = await axios.get(
-      "http://localhost:5001/api/sales/revenue",
+      "https://crmproject-1.onrender.com/api/sales/revenue",
       { headers: { Authorization: `Bearer ${token}` } }
     );
     setRevenue(res.data.totalRevenue);

@@ -8,7 +8,7 @@ function Customers() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/api/customers", {
+      const res = await axios.get("https://crmproject-1.onrender.com/api/customers", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -20,7 +20,7 @@ function Customers() {
   };
 
   const deleteCustomer = async (id) => {
-    await axios.delete(`http://localhost:5001/api/customers/${id}`, {
+    await axios.delete(`https://crmproject-1.onrender.com/api/customers/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

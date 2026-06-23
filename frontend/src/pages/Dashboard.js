@@ -35,7 +35,7 @@ function Dashboard() {
   const fetchStats = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5001/api/leads/dashboard/stats",
+        "https://crmproject-1.onrender.com/api/leads/dashboard/stats",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -53,7 +53,7 @@ function Dashboard() {
   // -------------------------
   const fetchLeads = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/api/leads", {
+      const res = await axios.get(https://crmproject-1.onrender.com/api/leads, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

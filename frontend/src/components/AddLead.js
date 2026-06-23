@@ -29,14 +29,14 @@ function AddLead({ fetchLeads, selectedLead, setSelectedLead }) {
     try {
       if (selectedLead) {
         await axios.put(
-          `http://localhost:5001/api/leads/${selectedLead._id}`,
+          `https://crmproject-1.onrender.com/api/leads/${selectedLead._id}`,
           lead
         );
 
         alert("Lead Updated Successfully!");
         setSelectedLead(null);
       } else {
-        await axios.post("http://localhost:5001/api/leads", lead);
+        await axios.post("https://crmproject-1.onrender.com/api/leads", lead);
 
         alert("Lead Added Successfully!");
       }

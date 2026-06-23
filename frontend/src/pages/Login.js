@@ -9,10 +9,10 @@ function Login({ setToken }) {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5001/api/auth/login", {
+      const res = await axios.post("https://crmproject-1.onrender.com/api/auth/login", ...), {
         email,
         password,
-      });
+      };
 
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
