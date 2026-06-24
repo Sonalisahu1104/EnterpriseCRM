@@ -2,10 +2,15 @@ import React, { useState } from "react";
 import axios from "axios";
 import AddLead from "../components/AddLead";
 
-function LeadList({ leads }) {
+function LeadList({
+  leads,
+  fetchLeads,
+  fetchStats,
+  setSelectedLead,
+  selectedLead
+}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [stageFilter, setStageFilter] = useState("All");
-  const [selectedLead, setSelectedLead] = useState(null);
 
   const token = localStorage.getItem("token");
 
@@ -25,6 +30,55 @@ function LeadList({ leads }) {
 
     return matchesSearch && matchesStage;
   });
+
+  // -------------------------
+  // DELETE LEAD
+  // -------------------------
+  const deleteLead = async (id) => {
+    if (!window.confirm("Delete this lead?")) return;
+
+    try {
+      await axios.delete(
+        `https://crmproject-1.onrender.com/api/leads/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchLeads();
+      fetchStats(); // IMPORTANT (fixes dashboard mismatch)
+    } catch (err) {
+      console.log(err);
+      alert("Delete failed");
+    }
+  };
+
+  // -------------------------
+  // CONVERT TO CUSTOMER
+  // -------------------------
+  const convertToCustomer = async (id) => {
+    try {
+      await axios.post(
+        `https://crmproject-1.onrender.com/api/customers/convert/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Lead converted to Customer");
+
+      fetchLeads();
+      fetchStats(); // IMPORTANT
+    } catch (err) {
+      console.log(err);
+      alert("Conversion failed");
+    }
+  };
 
   // -------------------------
   // EXPORT CSV
@@ -51,30 +105,6 @@ function LeadList({ leads }) {
     link.click();
   };
 
-  // -------------------------
-  // CONVERT TO CUSTOMER
-  // -------------------------
-  // -------------------------
-// CONVERT TO CUSTOMER
-// -------------------------
-const convertToCustomer = async (id) => {
-  try {
-    await axios.post(
-      `https://crmproject-1.onrender.com/api/customers/convert/${id}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    alert("Lead converted to Customer");
-  } catch (err) {
-    console.log(err);
-    alert("Conversion failed");
-  }
-};
   return (
     <div>
 
@@ -145,7 +175,15 @@ const convertToCustomer = async (id) => {
                     Edit
                   </button>
 
-                  {/* CONVERT TO CUSTOMER */}
+                  {/* DELETE */}
+                  <button
+                    className="btn btn-danger btn-sm me-2"
+                    onClick={() => deleteLead(lead._id)}
+                  >
+                    Delete
+                  </button>
+
+                  {/* CONVERT */}
                   <button
                     className="btn btn-success btn-sm"
                     onClick={() => convertToCustomer(lead._id)}
@@ -170,9 +208,12 @@ const convertToCustomer = async (id) => {
       {selectedLead && (
         <AddLead
           lead={selectedLead}
+          fetchLeads={fetchLeads}
+          fetchStats={fetchStats}
           onClose={() => setSelectedLead(null)}
         />
       )}
+
     </div>
   );
 }

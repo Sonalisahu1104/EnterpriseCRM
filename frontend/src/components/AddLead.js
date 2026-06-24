@@ -1,141 +1,146 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-function AddLead({ fetchLeads, selectedLead, setSelectedLead }) {
+function AddLead({
+  selectedLead,
+  setSelectedLead,
+  fetchLeads,
+  fetchStats,
+  onClose
+}) {
   const [lead, setLead] = useState({
     name: "",
     email: "",
-    phone: "",
     company: "",
     stage: "New",
   });
 
+  const token = localStorage.getItem("token");
+
+  // -------------------------
+  // PREFILL WHEN EDITING
+  // -------------------------
   useEffect(() => {
     if (selectedLead) {
       setLead(selectedLead);
     }
   }, [selectedLead]);
 
+  // -------------------------
+  // HANDLE CHANGE
+  // -------------------------
   const handleChange = (e) => {
-    setLead({
-      ...lead,
-      [e.target.name]: e.target.value,
-    });
+    setLead({ ...lead, [e.target.name]: e.target.value });
   };
 
+  // -------------------------
+  // SUBMIT (ADD + UPDATE)
+  // -------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       if (selectedLead) {
+        // UPDATE LEAD
         await axios.put(
           `https://crmproject-1.onrender.com/api/leads/${selectedLead._id}`,
-          lead
+          lead,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         alert("Lead Updated Successfully!");
         setSelectedLead(null);
       } else {
-        await axios.post("https://crmproject-1.onrender.com/api/leads", lead);
+        // CREATE LEAD
+        await axios.post(
+          "https://crmproject-1.onrender.com/api/leads/add",
+          lead,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         alert("Lead Added Successfully!");
       }
 
+      // Refresh dashboard
+      fetchLeads?.();
+      fetchStats?.();
+
+      // reset form
       setLead({
         name: "",
         email: "",
-        phone: "",
         company: "",
         stage: "New",
       });
 
-      fetchLeads();
-    } catch (error) {
-      console.log(error);
-      alert("Operation Failed");
+      // close modal if used
+      onClose?.();
+
+    } catch (err) {
+      console.log(err);
+      alert("Something went wrong");
     }
   };
 
   return (
-    <div className="card shadow mt-4">
-      <div className="card-header bg-primary text-white">
-        <h4>{selectedLead ? "Edit Lead" : "Add New Lead"}</h4>
-      </div>
+    <div className="card p-3 mt-3">
 
-      <div className="card-body">
-        <form onSubmit={handleSubmit}>
-          <div className="row">
+      <h4>
+        {selectedLead ? "Edit Lead" : "Add Lead"}
+      </h4>
 
-            <div className="col-md-6 mb-3">
-              <label>Name</label>
-              <input
-                type="text"
-                className="form-control"
-                name="name"
-                value={lead.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
+      <form onSubmit={handleSubmit}>
 
-            <div className="col-md-6 mb-3">
-              <label>Email</label>
-              <input
-                type="email"
-                className="form-control"
-                name="email"
-                value={lead.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
+        <input
+          className="form-control mb-2"
+          name="name"
+          placeholder="Name"
+          value={lead.name}
+          onChange={handleChange}
+        />
 
-            <div className="col-md-6 mb-3">
-              <label>Phone</label>
-              <input
-                type="text"
-                className="form-control"
-                name="phone"
-                value={lead.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
+        <input
+          className="form-control mb-2"
+          name="email"
+          placeholder="Email"
+          value={lead.email}
+          onChange={handleChange}
+        />
 
-            <div className="col-md-6 mb-3">
-              <label>Company</label>
-              <input
-                type="text"
-                className="form-control"
-                name="company"
-                value={lead.company}
-                onChange={handleChange}
-              />
-            </div>
+        <input
+          className="form-control mb-2"
+          name="company"
+          placeholder="Company"
+          value={lead.company}
+          onChange={handleChange}
+        />
 
-            <div className="col-md-6 mb-3">
-              <label>Stage</label>
-              <select
-                className="form-control"
-                name="stage"
-                value={lead.stage}
-                onChange={handleChange}
-              >
-                <option>New</option>
-                <option>Contacted</option>
-                <option>Qualified</option>
-                <option>Won</option>
-                <option>Lost</option>
-              </select>
-            </div>
+        <select
+          className="form-control mb-2"
+          name="stage"
+          value={lead.stage}
+          onChange={handleChange}
+        >
+          <option value="New">New</option>
+          <option value="Contacted">Contacted</option>
+          <option value="Qualified">Qualified</option>
+          <option value="Won">Won</option>
+          <option value="Lost">Lost</option>
+        </select>
 
-          </div>
+        <button className="btn btn-primary w-100">
+          {selectedLead ? "Update Lead" : "Add Lead"}
+        </button>
 
-          <button className="btn btn-success">
-            {selectedLead ? "Update Lead" : "Add Lead"}
-          </button>
-        </form>
-      </div>
+      </form>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LeadList from "./LeadList";
+import AddLead from "../components/AddLead";
 
 import {
   PieChart,
@@ -16,6 +17,8 @@ import {
 } from "recharts";
 
 function Dashboard() {
+  const token = localStorage.getItem("token");
+
   const [stats, setStats] = useState({
     totalLeads: 0,
     newLeads: 0,
@@ -26,12 +29,13 @@ function Dashboard() {
   });
 
   const [leads, setLeads] = useState([]);
+  const [selectedLead, setSelectedLead] = useState(null);
+  const [showAddLead, setShowAddLead] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
-  const token = localStorage.getItem("token");
-
-  // -------------------------
-  // FETCH STATS (PROTECTED)
-  // -------------------------
+  // ------------------------
+  // Fetch Dashboard Stats
+  // ------------------------
   const fetchStats = async () => {
     try {
       const res = await axios.get(
@@ -42,48 +46,52 @@ function Dashboard() {
           },
         }
       );
+
       setStats(res.data);
     } catch (err) {
-      console.log("Stats error:", err);
+      console.log(err);
     }
   };
 
-  // -------------------------
-  // FETCH LEADS (PROTECTED)
-  // -------------------------
- const fetchLeads = async () => {
+  // ------------------------
+  // Fetch Leads
+  // ------------------------
+  const fetchLeads = async () => {
   try {
     const res = await axios.get(
-      "https://crmproject-1.onrender.com/api/leads",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      "https://crmproject-1.onrender.com/api/leads"
     );
-
     setLeads(res.data);
   } catch (err) {
-    console.log("Leads error:", err);
+    console.log(err);
   }
 };
 
-  useEffect(() => {
-    fetchStats();
-    fetchLeads();
-  }, []);
+useEffect(() => {
+  fetchLeads();
+}, [refresh]);
 
-  // -------------------------
-  // LOGOUT
-  // -------------------------
+  // ------------------------
+  // Logout
+  // ------------------------
   const handleLogout = () => {
+  try {
     localStorage.removeItem("token");
-    window.location.href = "/login";
-  };
+    sessionStorage.clear();
 
-  // -------------------------
-  // CHART DATA
-  // -------------------------
+    // Redirect to login
+    window.location.replace("/login");
+  } catch (err) {
+    console.error(err);
+
+    // Even if an error occurs, redirect to login
+    window.location.replace("/login");
+  }
+};
+
+  // ------------------------
+  // Chart Data
+  // ------------------------
   const pieData = [
     { name: "New", value: stats.newLeads },
     { name: "Contacted", value: stats.contacted },
@@ -100,74 +108,92 @@ function Dashboard() {
     { stage: "Lost", value: stats.lost },
   ];
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#FF4D4F"];
+  const COLORS = [
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#FF4D4F",
+  ];
 
-  return (
-    <div className="container-fluid">
-      <div className="row">
+return (
+  <div className="container-fluid">
+    <div className="row">
 
-        {/* SIDEBAR */}
-        <div className="col-md-2 bg-dark text-white vh-100 p-3">
-          <h4>Enterprise CRM</h4>
-          <hr />
+      {/* SIDEBAR */}
+      <div className="col-md-2 bg-dark text-white vh-100 p-3">
+        <h4>Enterprise CRM</h4>
+        <hr />
 
-          <p>🏠 Dashboard</p>
-          <p>👤 Leads</p>
-          <p>👥 Customers</p>
-          <p>💰 Sales</p>
-          <p>📊 Reports</p>
+        <p>🏠 Dashboard</p>
+        <p>👤 Leads</p>
+        <p>👥 Customers</p>
+        <p>💰 Sales</p>
+        <p>📊 Reports</p>
 
-          <hr />
+        <hr />
 
-          <button className="btn btn-danger btn-sm" onClick={handleLogout}>
-            Logout
+        <button
+          className="btn btn-danger w-100"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div className="col-md-10 p-4">
+
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2>Enterprise CRM Dashboard</h2>
+
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowAddLead(true)}
+          >
+            + Add Lead
           </button>
         </div>
 
-        {/* MAIN CONTENT */}
-        <div className="col-md-10 p-4">
+        {/* STATS */}
+        <div className="row mb-4">
 
-          <h2>Dashboard</h2>
-
-          {/* STATS CARDS */}
-          <div className="row mt-4">
-
-            <div className="col-md-3">
-              <div className="card bg-primary text-white p-3">
-                <h5>Total Leads</h5>
-                <h2>{stats.totalLeads}</h2>
-              </div>
+          <div className="col-md-3">
+            <div className="card bg-primary text-white p-3">
+              <h5>Total Leads</h5>
+              <h2>{stats.totalLeads}</h2>
             </div>
-
-            <div className="col-md-3">
-              <div className="card bg-success text-white p-3">
-                <h5>New Leads</h5>
-                <h2>{stats.newLeads}</h2>
-              </div>
-            </div>
-
-            <div className="col-md-3">
-              <div className="card bg-warning text-dark p-3">
-                <h5>Qualified</h5>
-                <h2>{stats.qualified}</h2>
-              </div>
-            </div>
-
-            <div className="col-md-3">
-              <div className="card bg-danger text-white p-3">
-                <h5>Won</h5>
-                <h2>{stats.won}</h2>
-              </div>
-            </div>
-
           </div>
 
-          {/* CHARTS */}
-          <div className="row mt-5">
+          <div className="col-md-3">
+            <div className="card bg-success text-white p-3">
+              <h5>New Leads</h5>
+              <h2>{stats.newLeads}</h2>
+            </div>
+          </div>
 
-            {/* PIE CHART */}
-            <div className="col-md-6">
-              <h5>Lead Distribution</h5>
+          <div className="col-md-3">
+            <div className="card bg-warning text-dark p-3">
+              <h5>Qualified</h5>
+              <h2>{stats.qualified}</h2>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="card bg-danger text-white p-3">
+              <h5>Won</h5>
+              <h2>{stats.won}</h2>
+            </div>
+          </div>
+
+        </div>
+
+        {/* CHARTS */}
+        <div className="row mb-4">
+
+          <div className="col-md-6">
+            <div className="card shadow p-3">
+              <h5 className="text-center">Lead Distribution</h5>
 
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -181,17 +207,21 @@ function Dashboard() {
                     label
                   >
                     {pieData.map((entry, index) => (
-                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={index}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
             </div>
+          </div>
 
-            {/* BAR CHART */}
-            <div className="col-md-6">
-              <h5>Stage-wise Leads</h5>
+          <div className="col-md-6">
+            <div className="card shadow p-3">
+              <h5 className="text-center">Stage Wise Leads</h5>
 
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={barData}>
@@ -199,22 +229,57 @@ function Dashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="value" fill="#8884d8" />
+                  <Bar dataKey="value" fill="#0d6efd" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-
-          </div>
-
-          {/* LEADS TABLE */}
-          <div className="mt-5">
-            <LeadList leads={leads} />
           </div>
 
         </div>
+
+        {/* LEAD TABLE */}
+        <div className="card shadow">
+          <div className="card-header bg-dark text-white">
+            <h4>Lead Management</h4>
+          </div>
+
+          <div className="card-body">
+            <LeadList
+              leads={leads}
+              selectedLead={selectedLead}
+              setSelectedLead={setSelectedLead}
+              fetchLeads={fetchLeads}
+              fetchStats={fetchStats}
+            />
+          </div>
+        </div>
+
+        {/* ADD LEAD */}
+        {showAddLead && (
+          <AddLead
+            fetchLeads={() => {
+              fetchLeads();
+              fetchStats();
+            }}
+            selectedLead={null}
+            setSelectedLead={() => {
+              setShowAddLead(false);
+            }}
+          />
+        )}
+        {/* EDIT LEAD */}
+        {selectedLead && (
+          <AddLead
+            fetchLeads={fetchLeads}
+            selectedLead={selectedLead}
+            setSelectedLead={setSelectedLead}
+          />
+        )}
+
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default Dashboard;
