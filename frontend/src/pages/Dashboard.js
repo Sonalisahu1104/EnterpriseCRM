@@ -115,7 +115,24 @@ useEffect(() => {
     "#FF8042",
     "#FF4D4F",
   ];
+const pieData = [
+  { name: "New", value: stats.newLeads || 0 },
+  { name: "Contacted", value: stats.contacted || 0 },
+  { name: "Qualified", value: stats.qualified || 0 },
+  { name: "Won", value: stats.won || 0 },
+  { name: "Lost", value: stats.lost || 0 },
+];
 
+const barData = [
+  {
+    name: "Leads",
+    New: stats.newLeads || 0,
+    Contacted: stats.contacted || 0,
+    Qualified: stats.qualified || 0,
+    Won: stats.won || 0,
+    Lost: stats.lost || 0,
+  },
+];
 return (
   <div className="container-fluid">
     <div className="row">
