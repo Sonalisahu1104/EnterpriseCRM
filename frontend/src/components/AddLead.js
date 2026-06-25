@@ -70,8 +70,8 @@ function AddLead({
       }
 
       // Refresh dashboard
-      fetchLeads?.();
-      fetchStats?.();
+      fetchLeads();
+fetchStats();
 
       // reset form
       setLead({

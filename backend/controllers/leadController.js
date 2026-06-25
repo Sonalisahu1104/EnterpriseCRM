@@ -13,7 +13,7 @@ const createLead = async (req, res) => {
 };
 
 // -------------------------
-// GET ALL LEADS (WITH SEARCH + FILTER)
+// GET ALL LEADS (SEARCH + FILTER)
 // -------------------------
 const getLeads = async (req, res) => {
   try {
@@ -21,7 +21,6 @@ const getLeads = async (req, res) => {
 
     let filter = {};
 
-    // 🔍 SEARCH (name, email, company)
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -30,7 +29,6 @@ const getLeads = async (req, res) => {
       ];
     }
 
-    // 🎯 FILTER BY STAGE
     if (stage && stage !== "All") {
       filter.stage = stage;
     }
@@ -72,33 +70,31 @@ const deleteLead = async (req, res) => {
 };
 
 // -------------------------
-// DASHBOARD STATS (FIXED ERROR HERE)
+// DASHBOARD STATS (FIXED + SAFE)
 // -------------------------
 const getDashboardStats = async (req, res) => {
   try {
-    const totalLeads = await Lead.countDocuments();
+    const normalize = (s) => (s || "").toLowerCase();
 
-    const newLeads = await Lead.countDocuments({ stage: "New" });
-    const contacted = await Lead.countDocuments({ stage: "Contacted" });
-    const qualified = await Lead.countDocuments({ stage: "Qualified" });
-    const won = await Lead.countDocuments({ stage: "Won" });
-    const lost = await Lead.countDocuments({ stage: "Lost" });
+    const leads = await Lead.find();
 
-    res.json({
-      totalLeads,
-      newLeads,
-      contacted,
-      qualified,
-      won,
-      lost,
-    });
+    const stats = {
+      totalLeads: leads.length,
+      newLeads: leads.filter(l => normalize(l.stage) === "new").length,
+      contacted: leads.filter(l => normalize(l.stage) === "contacted").length,
+      qualified: leads.filter(l => normalize(l.stage) === "qualified").length,
+      won: leads.filter(l => normalize(l.stage) === "won").length,
+      lost: leads.filter(l => normalize(l.stage) === "lost").length,
+    };
+
+    res.json(stats);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 // -------------------------
-// EXPORT ALL FUNCTIONS
+// EXPORT
 // -------------------------
 module.exports = {
   createLead,

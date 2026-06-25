@@ -47,7 +47,7 @@ function Dashboard() {
         }
       );
 
-      setStats(res.data);
+      setStats({ ...res.data });
     } catch (err) {
       console.log(err);
     }
@@ -66,11 +66,10 @@ function Dashboard() {
     console.log(err);
   }
 };
-
 useEffect(() => {
   fetchLeads();
+  fetchStats();
 }, [refresh]);
-
   // ------------------------
   // Logout
   // ------------------------
@@ -107,16 +106,15 @@ const pieData = [
   { name: "Lost", value: stats.lost || 0 },
 ];
 
-const barData = [
-  {
-    name: "Leads",
-    New: stats.newLeads || 0,
-    Contacted: stats.contacted || 0,
-    Qualified: stats.qualified || 0,
-    Won: stats.won || 0,
-    Lost: stats.lost || 0,
-  },
+ const barData = [
+  { stage: "New", value: Number(stats.newLeads) || 0 },
+  { stage: "Contacted", value: Number(stats.contacted) || 0 },
+  { stage: "Qualified", value: Number(stats.qualified) || 0 },
+  { stage: "Won", value: Number(stats.won) || 0 },
+  { stage: "Lost", value: Number(stats.lost) || 0 },
 ];
+console.log("STATS:", stats);
+console.log("BAR DATA:", barData);
 return (
   <div className="container-fluid">
     <div className="row">
@@ -221,23 +219,22 @@ return (
           </div>
 
           <div className="col-md-6">
-            <div className="card shadow p-3">
-              <h5 className="text-center">Stage Wise Leads</h5>
+  <div className="card shadow p-3">
+    <h5 className="text-center">Stage Wise Leads</h5>
 
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={barData}>
-                  <XAxis dataKey="stage" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="value" fill="#0d6efd" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={barData}>
+        <XAxis dataKey="stage" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="value" fill="#0d6efd" />
+      </BarChart>
+    </ResponsiveContainer>
 
-        </div>
-
+  </div>
+</div>
+</div>
         {/* LEAD TABLE */}
         <div className="card shadow">
           <div className="card-header bg-dark text-white">
