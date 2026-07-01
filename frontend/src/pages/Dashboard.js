@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { supabase } from "../supabaseClient";
 import LeadList from "./LeadList";
 import AddLead from "../components/AddLead";
 import Customers from "./Customers";
 import Sales from "./Sales";
-import API_URL from "../config";
 
 import {
   PieChart,
@@ -20,8 +19,6 @@ import {
 } from "recharts";
 
 function Dashboard() {
-  const token = localStorage.getItem("token");
-
   const [activeTab, setActiveTab] = useState("Dashboard");
 
   const [stats, setStats] = useState({
@@ -38,31 +35,44 @@ function Dashboard() {
   const [showAddLead, setShowAddLead] = useState(false);
 
   // ------------------------
-  // Fetch Dashboard Stats
+  // Fetch Dashboard Stats directly from Supabase
   // ------------------------
   const fetchStats = async () => {
     try {
-      const res = await axios.get(`${API_URL}/leads/dashboard/stats`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data: leadsData, error } = await supabase.from("leads").select("stage");
+      if (error) throw error;
 
-      setStats({ ...res.data });
+      const normalize = (s) => (s || "").toLowerCase();
+      const list = leadsData || [];
+
+      setStats({
+        totalLeads: list.length,
+        newLeads: list.filter((l) => normalize(l.stage) === "new").length,
+        contacted: list.filter((l) => normalize(l.stage) === "contacted").length,
+        qualified: list.filter((l) => normalize(l.stage) === "qualified").length,
+        won: list.filter((l) => normalize(l.stage) === "won").length,
+        lost: list.filter((l) => normalize(l.stage) === "lost").length,
+      });
     } catch (err) {
-      console.log(err);
+      console.log("Error fetching stats:", err);
     }
   };
 
   // ------------------------
-  // Fetch Leads
+  // Fetch Leads directly from Supabase
   // ------------------------
   const fetchLeads = async () => {
     try {
-      const res = await axios.get(`${API_URL}/leads`);
-      setLeads(res.data);
+      const { data, error } = await supabase
+        .from("leads")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+
+      const formatted = (data || []).map((item) => ({ ...item, _id: item.id }));
+      setLeads(formatted);
     } catch (err) {
-      console.log(err);
+      console.log("Error fetching leads:", err);
     }
   };
 

@@ -1,67 +1,84 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import API_URL from "../config";
+import { supabase } from "../supabaseClient";
 
 function Sales() {
   const [sales, setSales] = useState([]);
   const [revenue, setRevenue] = useState(0);
 
-  const token = localStorage.getItem("token");
-
   const fetchSales = async () => {
-    const res = await axios.get(`${API_URL}/sales`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setSales(res.data);
-  };
+    try {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
 
-  const fetchRevenue = async () => {
-    const res = await axios.get(
-      `${API_URL}/sales/revenue`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setRevenue(res.data.totalRevenue);
+      const list = (data || []).map((s) => ({
+        ...s,
+        _id: s.id,
+        customerName: s.customerName || s.customername,
+        customerEmail: s.customerEmail || s.customeremail,
+      }));
+
+      setSales(list);
+
+      const total = list.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+      setRevenue(total);
+    } catch (err) {
+      console.log("Error fetching sales:", err);
+    }
   };
 
   useEffect(() => {
     fetchSales();
-    fetchRevenue();
   }, []);
 
   return (
-    <div className="container mt-4">
-
-      <h2>Sales Dashboard</h2>
+    <div className="container-fluid mt-2">
+      <h2 className="mb-4">Sales & Revenue Analytics</h2>
 
       {/* REVENUE CARD */}
-      <div className="card bg-success text-white p-3 mb-3">
-        <h4>Total Revenue</h4>
-        <h2>₹ {revenue}</h2>
+      <div className="row mb-4">
+        <div className="col-md-4">
+          <div className="card bg-success text-white p-4 shadow-sm border-0 rounded">
+            <h5>Total Recorded Revenue</h5>
+            <h1 className="fw-bold mb-0">₹ {revenue.toLocaleString()}</h1>
+          </div>
+        </div>
       </div>
 
       {/* SALES TABLE */}
-      <table className="table table-bordered">
+      <table className="table table-bordered table-hover bg-white shadow-sm">
         <thead className="table-dark">
           <tr>
-            <th>Customer</th>
+            <th>Customer Name</th>
             <th>Email</th>
-            <th>Amount</th>
-            <th>Status</th>
+            <th>Transaction Amount</th>
+            <th>Deal Status</th>
           </tr>
         </thead>
 
         <tbody>
-          {sales.map((s) => (
-            <tr key={s._id}>
-              <td>{s.customerName}</td>
-              <td>{s.customerEmail}</td>
-              <td>₹{s.amount}</td>
-              <td>{s.status}</td>
+          {sales.length > 0 ? (
+            sales.map((s) => (
+              <tr key={s._id}>
+                <td className="fw-bold">{s.customerName || "N/A"}</td>
+                <td>{s.customerEmail || "N/A"}</td>
+                <td className="text-success fw-bold">₹{(Number(s.amount) || 0).toLocaleString()}</td>
+                <td>
+                  <span className="badge bg-success">{s.status || "Closed"}</span>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4" className="text-center py-4 text-muted">
+                No sales records found
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
-
     </div>
   );
 }

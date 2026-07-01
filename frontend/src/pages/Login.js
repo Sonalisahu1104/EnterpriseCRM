@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import API_URL from "../config";
+import { supabase } from "../supabaseClient";
 
 function Login({ setToken }) {
   const [email, setEmail] = useState("");
@@ -15,20 +14,37 @@ function Login({ setToken }) {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        `${API_URL}/auth/login`,
-        {
-          email,
-          password,
-        }
-      );
+      // Demo credentials check
+      if (email === "test@gmail.com" && password === "123456") {
+        const token = "demo-token-123456";
+        localStorage.setItem("token", token);
+        setToken(token);
+        navigate("/");
+        return;
+      }
 
-      localStorage.setItem("token", res.data.token);
-      setToken(res.data.token);
+      // Check Supabase users table
+      const { data: user, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email)
+        .single();
 
+      if (error || !user) {
+        throw new Error("Invalid email or password");
+      }
+
+      // Simple password check
+      if (user.password !== password) {
+        throw new Error("Invalid email or password");
+      }
+
+      const token = `supabase-user-${user.id}`;
+      localStorage.setItem("token", token);
+      setToken(token);
       navigate("/");
     } catch (error) {
-      alert(error.response?.data?.message || "Invalid email or password");
+      alert(error.message || "Invalid email or password");
     } finally {
       setLoading(false);
     }

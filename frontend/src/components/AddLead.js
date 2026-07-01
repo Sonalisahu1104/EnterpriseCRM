@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import API_URL from "../config";
+import { supabase } from "../supabaseClient";
 
 function AddLead({
   selectedLead,
@@ -12,18 +11,25 @@ function AddLead({
   const [lead, setLead] = useState({
     name: "",
     email: "",
+    phone: "",
     company: "",
     stage: "New",
   });
 
-  const token = localStorage.getItem("token");
+  const [loading, setLoading] = useState(false);
 
   // -------------------------
   // PREFILL WHEN EDITING
   // -------------------------
   useEffect(() => {
     if (selectedLead) {
-      setLead(selectedLead);
+      setLead({
+        name: selectedLead.name || "",
+        email: selectedLead.email || "",
+        phone: selectedLead.phone || "",
+        company: selectedLead.company || "",
+        stage: selectedLead.stage || "New",
+      });
     }
   }, [selectedLead]);
 
@@ -35,112 +41,159 @@ function AddLead({
   };
 
   // -------------------------
-  // SUBMIT (ADD + UPDATE)
+  // SUBMIT (ADD + UPDATE via Supabase)
   // -------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       if (selectedLead) {
-        // UPDATE LEAD
-        await axios.put(
-          `${API_URL}/leads/${selectedLead._id}`,
-          lead,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        // UPDATE LEAD IN SUPABASE
+        const { error } = await supabase
+          .from("leads")
+          .update({
+            name: lead.name,
+            email: lead.email,
+            phone: lead.phone || "0000000000",
+            company: lead.company,
+            stage: lead.stage,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", selectedLead._id);
+
+        if (error) throw error;
 
         alert("Lead Updated Successfully!");
-        setSelectedLead(null);
+        if (setSelectedLead) setSelectedLead(null);
       } else {
-        // CREATE LEAD
-        await axios.post(
-          `${API_URL}/leads/add`,
-          lead,
+        // CREATE LEAD IN SUPABASE
+        const { error } = await supabase.from("leads").insert([
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+            name: lead.name,
+            email: lead.email,
+            phone: lead.phone || "0000000000",
+            company: lead.company,
+            stage: lead.stage || "New",
+          },
+        ]);
+
+        if (error) throw error;
 
         alert("Lead Added Successfully!");
       }
 
-      // Refresh dashboard
-      fetchLeads();
-fetchStats();
+      // Refresh dashboard & stats
+      if (fetchLeads) fetchLeads();
+      if (fetchStats) fetchStats();
 
-      // reset form
+      // Reset form
       setLead({
         name: "",
         email: "",
+        phone: "",
         company: "",
         stage: "New",
       });
 
-      // close modal if used
+      // Close modal if used
       onClose?.();
-
     } catch (err) {
-      console.log(err);
-      alert("Something went wrong");
+      console.log("Error saving lead:", err);
+      alert(err.message || "Something went wrong saving to Supabase");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="card p-3 mt-3">
-
-      <h4>
-        {selectedLead ? "Edit Lead" : "Add Lead"}
-      </h4>
+    <div className="card p-4 mt-3 shadow-sm border-0 rounded">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4 className="fw-bold mb-0">
+          {selectedLead ? "Edit Lead Details" : "Add New Lead"}
+        </h4>
+        {(selectedLead || onClose) && (
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => {
+              if (setSelectedLead) setSelectedLead(null);
+              onClose?.();
+            }}
+          ></button>
+        )}
+      </div>
 
       <form onSubmit={handleSubmit}>
+        <div className="mb-2">
+          <label className="form-label small fw-bold">Full Name *</label>
+          <input
+            className="form-control"
+            name="name"
+            placeholder="John Doe"
+            value={lead.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-        <input
-          className="form-control mb-2"
-          name="name"
-          placeholder="Name"
-          value={lead.name}
-          onChange={handleChange}
-        />
+        <div className="row">
+          <div className="col-md-6 mb-2">
+            <label className="form-label small fw-bold">Email Address *</label>
+            <input
+              type="email"
+              className="form-control"
+              name="email"
+              placeholder="john@example.com"
+              value={lead.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-6 mb-2">
+            <label className="form-label small fw-bold">Phone Number</label>
+            <input
+              type="text"
+              className="form-control"
+              name="phone"
+              placeholder="9876543210"
+              value={lead.phone}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
 
-        <input
-          className="form-control mb-2"
-          name="email"
-          placeholder="Email"
-          value={lead.email}
-          onChange={handleChange}
-        />
+        <div className="row mb-3">
+          <div className="col-md-6 mb-2">
+            <label className="form-label small fw-bold">Company Name</label>
+            <input
+              className="form-control"
+              name="company"
+              placeholder="TechCorp"
+              value={lead.company}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="col-md-6 mb-2">
+            <label className="form-label small fw-bold">Lead Stage</label>
+            <select
+              className="form-select"
+              name="stage"
+              value={lead.stage}
+              onChange={handleChange}
+            >
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Qualified">Qualified</option>
+              <option value="Won">Won</option>
+              <option value="Lost">Lost</option>
+            </select>
+          </div>
+        </div>
 
-        <input
-          className="form-control mb-2"
-          name="company"
-          placeholder="Company"
-          value={lead.company}
-          onChange={handleChange}
-        />
-
-        <select
-          className="form-control mb-2"
-          name="stage"
-          value={lead.stage}
-          onChange={handleChange}
-        >
-          <option value="New">New</option>
-          <option value="Contacted">Contacted</option>
-          <option value="Qualified">Qualified</option>
-          <option value="Won">Won</option>
-          <option value="Lost">Lost</option>
-        </select>
-
-        <button className="btn btn-primary w-100">
-          {selectedLead ? "Update Lead" : "Add Lead"}
+        <button className="btn btn-primary w-100 py-2 fw-bold shadow-sm" type="submit" disabled={loading}>
+          {loading ? "Saving to Supabase..." : selectedLead ? "Update Lead" : "Add Lead to Database"}
         </button>
-
       </form>
     </div>
   );
