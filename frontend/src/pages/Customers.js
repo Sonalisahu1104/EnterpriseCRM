@@ -34,45 +34,47 @@ function Customers() {
   }, []);
 
   return (
-    <div className="container-fluid mt-2">
-      <h2 className="mb-4">Converted Customers Database</h2>
+    <div className="container-fluid p-0">
+      <h3 className="fw-bold mb-3">Converted Customers Database</h3>
 
-      <table className="table table-bordered table-hover bg-white shadow-sm">
-        <thead className="table-dark">
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Company</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover bg-white shadow-sm mb-0" style={{ minWidth: "500px" }}>
+          <thead className="table-dark">
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th style={{ width: "100px" }}>Action</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          {customers.length > 0 ? (
-            customers.map((c) => (
-              <tr key={c._id}>
-                <td className="fw-bold">{c.name}</td>
-                <td>{c.email}</td>
-                <td>{c.company}</td>
-                <td>
-                  <button
-                    className="btn btn-danger btn-sm shadow-sm"
-                    onClick={() => deleteCustomer(c._id)}
-                  >
-                    Delete
-                  </button>
+          <tbody>
+            {customers.length > 0 ? (
+              customers.map((c) => (
+                <tr key={c._id} className="align-middle">
+                  <td className="fw-bold">{c.name}</td>
+                  <td>{c.email}</td>
+                  <td>{c.company}</td>
+                  <td>
+                    <button
+                      className="btn btn-danger btn-sm shadow-sm px-3"
+                      onClick={() => deleteCustomer(c._id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center py-4 text-muted">
+                  No converted customers found
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="text-center py-4 text-muted">
-                No converted customers found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

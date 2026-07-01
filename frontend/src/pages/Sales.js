@@ -34,51 +34,53 @@ function Sales() {
   }, []);
 
   return (
-    <div className="container-fluid mt-2">
-      <h2 className="mb-4">Sales & Revenue Analytics</h2>
+    <div className="container-fluid p-0">
+      <h3 className="fw-bold mb-3">Sales & Revenue Analytics</h3>
 
       {/* REVENUE CARD */}
-      <div className="row mb-4">
-        <div className="col-md-4">
-          <div className="card bg-success text-white p-4 shadow-sm border-0 rounded">
-            <h5>Total Recorded Revenue</h5>
+      <div className="row g-3 mb-4">
+        <div className="col-12 col-md-5">
+          <div className="card bg-success text-white p-4 shadow-sm border-0 rounded-3">
+            <h6 className="small text-uppercase mb-1 opacity-75">Total Recorded Revenue</h6>
             <h1 className="fw-bold mb-0">₹ {revenue.toLocaleString()}</h1>
           </div>
         </div>
       </div>
 
       {/* SALES TABLE */}
-      <table className="table table-bordered table-hover bg-white shadow-sm">
-        <thead className="table-dark">
-          <tr>
-            <th>Customer Name</th>
-            <th>Email</th>
-            <th>Transaction Amount</th>
-            <th>Deal Status</th>
-          </tr>
-        </thead>
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover bg-white shadow-sm mb-0" style={{ minWidth: "500px" }}>
+          <thead className="table-dark">
+            <tr>
+              <th>Customer Name</th>
+              <th>Email</th>
+              <th>Transaction Amount</th>
+              <th>Deal Status</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          {sales.length > 0 ? (
-            sales.map((s) => (
-              <tr key={s._id}>
-                <td className="fw-bold">{s.customerName || "N/A"}</td>
-                <td>{s.customerEmail || "N/A"}</td>
-                <td className="text-success fw-bold">₹{(Number(s.amount) || 0).toLocaleString()}</td>
-                <td>
-                  <span className="badge bg-success">{s.status || "Closed"}</span>
+          <tbody>
+            {sales.length > 0 ? (
+              sales.map((s) => (
+                <tr key={s._id} className="align-middle">
+                  <td className="fw-bold">{s.customerName || "N/A"}</td>
+                  <td>{s.customerEmail || "N/A"}</td>
+                  <td className="text-success fw-bold">₹{(Number(s.amount) || 0).toLocaleString()}</td>
+                  <td>
+                    <span className="badge bg-success">{s.status || "Closed"}</span>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center py-4 text-muted">
+                  No sales records found
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="text-center py-4 text-muted">
-                No sales records found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -117,10 +117,41 @@ function Dashboard() {
   ];
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        {/* SIDEBAR */}
-        <div className="col-md-2 bg-dark text-white vh-100 p-3 d-flex flex-column justify-content-between shadow-lg">
+    <div className="container-fluid p-0">
+      {/* MOBILE TOP NAVBAR & TABS */}
+      <div className="d-md-none bg-dark text-white p-3 shadow-lg sticky-top">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="fw-bold mb-0 text-light">🚀 Enterprise CRM</h5>
+          <button className="btn btn-sm btn-outline-danger px-3 rounded-pill" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+
+        {/* HORIZONTAL SCROLLABLE PILL TABS FOR MOBILE */}
+        <div
+          className="d-flex gap-2 pb-1"
+          style={{ overflowX: "auto", whiteSpace: "nowrap", WebkitOverflowScrolling: "touch" }}
+        >
+          {sidebarTabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`btn btn-sm px-3 rounded-pill fw-bold ${
+                activeTab === tab.key ? "btn-primary shadow-sm" : "btn-dark text-light border border-secondary"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="row g-0">
+        {/* DESKTOP SIDEBAR */}
+        <div
+          className="d-none d-md-flex col-md-2 bg-dark text-white vh-100 p-3 flex-column justify-content-between shadow-lg sticky-top"
+          style={{ minWidth: "220px", zIndex: 1020 }}
+        >
           <div>
             <h4 className="fw-bold mb-3 text-center text-light">Enterprise CRM</h4>
             <hr className="border-secondary" />
@@ -156,58 +187,64 @@ function Dashboard() {
 
           <div>
             <hr className="border-secondary" />
-            <button className="btn btn-danger w-100 py-2 shadow-sm" onClick={handleLogout}>
+            <button className="btn btn-danger w-100 py-2 shadow-sm fw-bold" onClick={handleLogout}>
               Logout
             </button>
           </div>
         </div>
 
         {/* MAIN CONTENT AREA */}
-        <div className="col-md-10 p-4" style={{ backgroundColor: "#f8f9fa", minHeight: "100vh", overflowY: "auto" }}>
+        <div
+          className="col-12 col-md-10 p-3 p-md-4"
+          style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
+        >
           {/* TAB 1: DASHBOARD */}
           {activeTab === "Dashboard" && (
             <div>
-              <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Enterprise CRM Dashboard</h2>
-                <button className="btn btn-primary shadow-sm" onClick={() => setShowAddLead(true)}>
+              <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
+                <h2 className="fw-bold mb-0 fs-3">Executive Dashboard</h2>
+                <button
+                  className="btn btn-primary shadow-sm w-100 w-sm-auto fw-bold px-4 py-2"
+                  onClick={() => setShowAddLead(true)}
+                >
                   + Add Lead
                 </button>
               </div>
 
               {/* STATS CARDS */}
-              <div className="row mb-4">
-                <div className="col-md-3 mb-2">
-                  <div className="card bg-primary text-white p-3 shadow-sm border-0">
-                    <h5>Total Leads</h5>
-                    <h2 className="fw-bold">{stats.totalLeads}</h2>
+              <div className="row g-3 mb-4">
+                <div className="col-6 col-md-3">
+                  <div className="card bg-primary text-white p-3 shadow-sm border-0 h-100 rounded-3">
+                    <h6 className="small text-uppercase mb-1 opacity-75">Total Leads</h6>
+                    <h2 className="fw-bold mb-0">{stats.totalLeads}</h2>
                   </div>
                 </div>
-                <div className="col-md-3 mb-2">
-                  <div className="card bg-success text-white p-3 shadow-sm border-0">
-                    <h5>New Leads</h5>
-                    <h2 className="fw-bold">{stats.newLeads}</h2>
+                <div className="col-6 col-md-3">
+                  <div className="card bg-success text-white p-3 shadow-sm border-0 h-100 rounded-3">
+                    <h6 className="small text-uppercase mb-1 opacity-75">New Leads</h6>
+                    <h2 className="fw-bold mb-0">{stats.newLeads}</h2>
                   </div>
                 </div>
-                <div className="col-md-3 mb-2">
-                  <div className="card bg-warning text-dark p-3 shadow-sm border-0">
-                    <h5>Qualified</h5>
-                    <h2 className="fw-bold">{stats.qualified}</h2>
+                <div className="col-6 col-md-3">
+                  <div className="card bg-warning text-dark p-3 shadow-sm border-0 h-100 rounded-3">
+                    <h6 className="small text-uppercase mb-1 opacity-75">Qualified</h6>
+                    <h2 className="fw-bold mb-0">{stats.qualified}</h2>
                   </div>
                 </div>
-                <div className="col-md-3 mb-2">
-                  <div className="card bg-danger text-white p-3 shadow-sm border-0">
-                    <h5>Won</h5>
-                    <h2 className="fw-bold">{stats.won}</h2>
+                <div className="col-6 col-md-3">
+                  <div className="card bg-danger text-white p-3 shadow-sm border-0 h-100 rounded-3">
+                    <h6 className="small text-uppercase mb-1 opacity-75">Won Deals</h6>
+                    <h2 className="fw-bold mb-0">{stats.won}</h2>
                   </div>
                 </div>
               </div>
 
               {/* CHARTS */}
-              <div className="row mb-4">
-                <div className="col-md-6 mb-3">
-                  <div className="card shadow-sm p-3 border-0 rounded">
+              <div className="row g-3 mb-4">
+                <div className="col-12 col-md-6">
+                  <div className="card shadow-sm p-3 border-0 rounded-3 h-100">
                     <h5 className="text-center fw-bold mb-3">Lead Distribution</h5>
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={280}>
                       <PieChart>
                         <Pie
                           data={pieData}
@@ -215,7 +252,7 @@ function Dashboard() {
                           nameKey="name"
                           cx="50%"
                           cy="50%"
-                          outerRadius={100}
+                          outerRadius={90}
                           label
                         >
                           {pieData.map((entry, index) => (
@@ -228,10 +265,10 @@ function Dashboard() {
                   </div>
                 </div>
 
-                <div className="col-md-6 mb-3">
-                  <div className="card shadow-sm p-3 border-0 rounded">
+                <div className="col-12 col-md-6">
+                  <div className="card shadow-sm p-3 border-0 rounded-3 h-100">
                     <h5 className="text-center fw-bold mb-3">Stage Wise Leads</h5>
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={280}>
                       <BarChart data={barData}>
                         <XAxis dataKey="stage" />
                         <YAxis />
@@ -245,14 +282,14 @@ function Dashboard() {
               </div>
 
               {/* RECENT LEADS TABLE IN DASHBOARD */}
-              <div className="card shadow-sm border-0 rounded">
-                <div className="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-                  <h4 className="mb-0">Recent Lead Management</h4>
-                  <button className="btn btn-sm btn-outline-light" onClick={() => setActiveTab("Leads")}>
+              <div className="card shadow-sm border-0 rounded-3">
+                <div className="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3 flex-wrap gap-2">
+                  <h5 className="mb-0 fw-bold">Recent Lead Management</h5>
+                  <button className="btn btn-sm btn-outline-light rounded-pill px-3" onClick={() => setActiveTab("Leads")}>
                     View All Leads →
                   </button>
                 </div>
-                <div className="card-body p-3">
+                <div className="card-body p-2 p-md-3">
                   <LeadList
                     leads={leads}
                     selectedLead={selectedLead}
@@ -268,18 +305,21 @@ function Dashboard() {
           {/* TAB 2: LEADS */}
           {activeTab === "Leads" && (
             <div>
-              <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Leads Management</h2>
-                <button className="btn btn-primary shadow-sm" onClick={() => setShowAddLead(true)}>
+              <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
+                <h2 className="fw-bold mb-0 fs-3">Leads Management</h2>
+                <button
+                  className="btn btn-primary shadow-sm w-100 w-sm-auto fw-bold px-4 py-2"
+                  onClick={() => setShowAddLead(true)}
+                >
                   + Add Lead
                 </button>
               </div>
 
-              <div className="card shadow-sm border-0 rounded">
+              <div className="card shadow-sm border-0 rounded-3">
                 <div className="card-header bg-primary text-white py-3">
-                  <h4 className="mb-0">All Tracked Leads</h4>
+                  <h5 className="mb-0 fw-bold">All Tracked Leads</h5>
                 </div>
-                <div className="card-body p-3">
+                <div className="card-body p-2 p-md-3">
                   <LeadList
                     leads={leads}
                     selectedLead={selectedLead}
@@ -294,14 +334,14 @@ function Dashboard() {
 
           {/* TAB 3: CUSTOMERS */}
           {activeTab === "Customers" && (
-            <div className="card shadow-sm border-0 rounded p-3">
+            <div className="card shadow-sm border-0 rounded-3 p-2 p-md-3">
               <Customers />
             </div>
           )}
 
           {/* TAB 4: SALES */}
           {activeTab === "Sales" && (
-            <div className="card shadow-sm border-0 rounded p-3">
+            <div className="card shadow-sm border-0 rounded-3 p-2 p-md-3">
               <Sales />
             </div>
           )}
@@ -309,10 +349,10 @@ function Dashboard() {
           {/* TAB 5: REPORTS */}
           {activeTab === "Reports" && (
             <div>
-              <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Analytics & Executive Reports</h2>
+              <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
+                <h2 className="fw-bold mb-0 fs-3">Analytics & Executive Reports</h2>
                 <button
-                  className="btn btn-success btn-lg shadow-sm d-flex align-items-center"
+                  className="btn btn-success btn-lg shadow-sm w-100 w-sm-auto fw-bold"
                   onClick={() => {
                     const headers = ["Name", "Email", "Company", "Stage"];
                     const rows = leads.map((l) => [l.name, l.email, l.company, l.stage]);
@@ -327,71 +367,72 @@ function Dashboard() {
                     link.click();
                   }}
                 >
-                  📁 Download Complete CRM CSV Report
+                  📁 Download CSV Report
                 </button>
               </div>
 
-              <div className="row mb-4">
-                <div className="col-md-4 mb-2">
-                  <div className="card bg-info text-white p-3 shadow-sm border-0">
-                    <h5>Total Tracked Leads</h5>
-                    <h2 className="fw-bold">{stats.totalLeads}</h2>
+              <div className="row g-3 mb-4">
+                <div className="col-12 col-md-4">
+                  <div className="card bg-info text-white p-3 shadow-sm border-0 rounded-3 h-100">
+                    <h6 className="small text-uppercase mb-1 opacity-75">Total Tracked Leads</h6>
+                    <h2 className="fw-bold mb-0">{stats.totalLeads}</h2>
                   </div>
                 </div>
-                <div className="col-md-4 mb-2">
-                  <div className="card bg-success text-white p-3 shadow-sm border-0">
-                    <h5>Closed / Won Deals</h5>
-                    <h2 className="fw-bold">{stats.won}</h2>
+                <div className="col-12 col-md-4">
+                  <div className="card bg-success text-white p-3 shadow-sm border-0 rounded-3 h-100">
+                    <h6 className="small text-uppercase mb-1 opacity-75">Closed / Won Deals</h6>
+                    <h2 className="fw-bold mb-0">{stats.won}</h2>
                   </div>
                 </div>
-                <div className="col-md-4 mb-2">
-                  <div className="card bg-warning text-dark p-3 shadow-sm border-0">
-                    <h5>Lost Opportunities</h5>
-                    <h2 className="fw-bold">{stats.lost}</h2>
+                <div className="col-12 col-md-4">
+                  <div className="card bg-warning text-dark p-3 shadow-sm border-0 rounded-3 h-100">
+                    <h6 className="small text-uppercase mb-1 opacity-75">Lost Opportunities</h6>
+                    <h2 className="fw-bold mb-0">{stats.lost}</h2>
                   </div>
                 </div>
               </div>
 
-              <div className="card shadow-sm p-4 border-0 rounded">
-                <h4 className="fw-bold">Stage Conversion & Breakdown</h4>
-                <hr />
-                <table className="table table-striped table-hover mt-2">
-                  <thead className="table-dark">
-                    <tr>
-                      <th>Lead Stage</th>
-                      <th>Total Count</th>
-                      <th>Percentage of Total</th>
-                      <th>Visual Progress Indicator</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {barData.map((b, i) => {
-                      const pct =
-                        stats.totalLeads > 0
-                          ? ((b.value / stats.totalLeads) * 100).toFixed(1)
-                          : 0;
-                      return (
-                        <tr key={i}>
-                          <td className="fw-bold">{b.stage}</td>
-                          <td>{b.value}</td>
-                          <td>{pct}%</td>
-                          <td style={{ verticalAlign: "middle", width: "40%" }}>
-                            <div className="progress shadow-sm" style={{ height: "12px" }}>
-                              <div
-                                className="progress-bar"
-                                role="progressbar"
-                                style={{
-                                  width: `${pct}%`,
-                                  backgroundColor: COLORS[i % COLORS.length],
-                                }}
-                              ></div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className="card shadow-sm p-3 p-md-4 border-0 rounded-3">
+                <h4 className="fw-bold mb-3">Stage Conversion & Breakdown</h4>
+                <div className="table-responsive">
+                  <table className="table table-striped table-hover mt-2 mb-0">
+                    <thead className="table-dark">
+                      <tr>
+                        <th>Lead Stage</th>
+                        <th>Total Count</th>
+                        <th>Percentage</th>
+                        <th style={{ minWidth: "150px" }}>Visual Indicator</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {barData.map((b, i) => {
+                        const pct =
+                          stats.totalLeads > 0
+                            ? ((b.value / stats.totalLeads) * 100).toFixed(1)
+                            : 0;
+                        return (
+                          <tr key={i}>
+                            <td className="fw-bold">{b.stage}</td>
+                            <td>{b.value}</td>
+                            <td>{pct}%</td>
+                            <td style={{ verticalAlign: "middle" }}>
+                              <div className="progress shadow-sm" style={{ height: "12px" }}>
+                                <div
+                                  className="progress-bar"
+                                  role="progressbar"
+                                  style={{
+                                    width: `${pct}%`,
+                                    backgroundColor: COLORS[i % COLORS.length],
+                                  }}
+                                ></div>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}

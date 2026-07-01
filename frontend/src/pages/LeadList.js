@@ -108,20 +108,20 @@ function LeadList({
   return (
     <div>
       {/* SEARCH + FILTER + EXPORT */}
-      <div className="row mb-3">
-        <div className="col-md-5">
+      <div className="row g-2 mb-3">
+        <div className="col-12 col-md-5">
           <input
             type="text"
-            className="form-control"
-            placeholder="🔍 Search by name, email, company..."
+            className="form-control form-control-sm"
+            placeholder="🔍 Search name, email, company..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        <div className="col-md-3">
+        <div className="col-6 col-md-3">
           <select
-            className="form-control"
+            className="form-select form-select-sm"
             value={stageFilter}
             onChange={(e) => setStageFilter(e.target.value)}
           >
@@ -134,84 +134,88 @@ function LeadList({
           </select>
         </div>
 
-        <div className="col-md-4">
-          <button className="btn btn-success w-100 shadow-sm" onClick={exportToCSV}>
+        <div className="col-6 col-md-4">
+          <button className="btn btn-success btn-sm w-100 shadow-sm fw-bold" onClick={exportToCSV}>
             📁 Export CSV
           </button>
         </div>
       </div>
 
-      {/* TABLE */}
-      <table className="table table-bordered table-hover bg-white shadow-sm">
-        <thead className="table-dark">
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Company</th>
-            <th>Stage</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+      {/* RESPONSIVE TABLE CONTAINER */}
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover bg-white shadow-sm mb-0" style={{ minWidth: "600px" }}>
+          <thead className="table-dark">
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Stage</th>
+              <th style={{ minWidth: "180px" }}>Actions</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          {filteredLeads.length > 0 ? (
-            filteredLeads.map((lead) => (
-              <tr key={lead._id}>
-                <td className="fw-bold">{lead.name}</td>
-                <td>{lead.email}</td>
-                <td>{lead.company}</td>
-                <td>
-                  <span
-                    className={`badge ${
-                      lead.stage === "Won"
-                        ? "bg-success"
-                        : lead.stage === "Qualified"
-                        ? "bg-warning text-dark"
-                        : lead.stage === "Lost"
-                        ? "bg-danger"
-                        : "bg-info text-dark"
-                    }`}
-                  >
-                    {lead.stage}
-                  </span>
-                </td>
+          <tbody>
+            {filteredLeads.length > 0 ? (
+              filteredLeads.map((lead) => (
+                <tr key={lead._id} className="align-middle">
+                  <td className="fw-bold">{lead.name}</td>
+                  <td>{lead.email}</td>
+                  <td>{lead.company}</td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        lead.stage === "Won"
+                          ? "bg-success"
+                          : lead.stage === "Qualified"
+                          ? "bg-warning text-dark"
+                          : lead.stage === "Lost"
+                          ? "bg-danger"
+                          : "bg-info text-dark"
+                      }`}
+                    >
+                      {lead.stage}
+                    </span>
+                  </td>
 
-                <td>
-                  {/* EDIT */}
-                  <button
-                    className="btn btn-primary btn-sm me-2 shadow-sm"
-                    onClick={() => setSelectedLead(lead)}
-                  >
-                    Edit
-                  </button>
+                  <td>
+                    <div className="d-flex gap-1 flex-wrap">
+                      {/* EDIT */}
+                      <button
+                        className="btn btn-primary btn-sm px-2 shadow-sm"
+                        onClick={() => setSelectedLead(lead)}
+                      >
+                        Edit
+                      </button>
 
-                  {/* DELETE */}
-                  <button
-                    className="btn btn-danger btn-sm me-2 shadow-sm"
-                    onClick={() => deleteLead(lead._id)}
-                  >
-                    Delete
-                  </button>
+                      {/* DELETE */}
+                      <button
+                        className="btn btn-danger btn-sm px-2 shadow-sm"
+                        onClick={() => deleteLead(lead._id)}
+                      >
+                        Delete
+                      </button>
 
-                  {/* CONVERT */}
-                  <button
-                    className="btn btn-success btn-sm shadow-sm"
-                    onClick={() => convertToCustomer(lead._id)}
-                  >
-                    Convert
-                  </button>
+                      {/* CONVERT */}
+                      <button
+                        className="btn btn-success btn-sm px-2 shadow-sm"
+                        onClick={() => convertToCustomer(lead._id)}
+                      >
+                        Convert
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center py-4 text-muted">
+                  No leads found
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5" className="text-center py-4 text-muted">
-                No leads found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

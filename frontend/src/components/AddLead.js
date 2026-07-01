@@ -107,9 +107,9 @@ function AddLead({
   };
 
   return (
-    <div className="card p-4 mt-3 shadow-sm border-0 rounded">
+    <div className="card p-3 p-md-4 mt-3 shadow-sm border-0 rounded-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="fw-bold mb-0">
+        <h4 className="fw-bold mb-0 fs-5">
           {selectedLead ? "Edit Lead Details" : "Add New Lead"}
         </h4>
         {(selectedLead || onClose) && (
@@ -126,7 +126,7 @@ function AddLead({
 
       <form onSubmit={handleSubmit}>
         <div className="mb-2">
-          <label className="form-label small fw-bold">Full Name *</label>
+          <label className="form-label small fw-bold text-secondary">Full Name *</label>
           <input
             className="form-control"
             name="name"
@@ -137,9 +137,9 @@ function AddLead({
           />
         </div>
 
-        <div className="row">
-          <div className="col-md-6 mb-2">
-            <label className="form-label small fw-bold">Email Address *</label>
+        <div className="row g-2 mb-2">
+          <div className="col-12 col-md-6">
+            <label className="form-label small fw-bold text-secondary">Email Address *</label>
             <input
               type="email"
               className="form-control"
@@ -150,8 +150,8 @@ function AddLead({
               required
             />
           </div>
-          <div className="col-md-6 mb-2">
-            <label className="form-label small fw-bold">Phone Number</label>
+          <div className="col-12 col-md-6">
+            <label className="form-label small fw-bold text-secondary">Phone Number</label>
             <input
               type="text"
               className="form-control"
@@ -163,9 +163,9 @@ function AddLead({
           </div>
         </div>
 
-        <div className="row mb-3">
-          <div className="col-md-6 mb-2">
-            <label className="form-label small fw-bold">Company Name</label>
+        <div className="row g-2 mb-3">
+          <div className="col-12 col-md-6">
+            <label className="form-label small fw-bold text-secondary">Company Name</label>
             <input
               className="form-control"
               name="company"
@@ -174,8 +174,8 @@ function AddLead({
               onChange={handleChange}
             />
           </div>
-          <div className="col-md-6 mb-2">
-            <label className="form-label small fw-bold">Lead Stage</label>
+          <div className="col-12 col-md-6">
+            <label className="form-label small fw-bold text-secondary">Lead Stage</label>
             <select
               className="form-select"
               name="stage"

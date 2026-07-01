@@ -52,18 +52,24 @@ function Login({ setToken }) {
 
   return (
     <div
-      className="container d-flex justify-content-center align-items-center"
-      style={{ minHeight: "100vh" }}
+      className="container-fluid d-flex justify-content-center align-items-center p-3"
+      style={{ minHeight: "100vh", backgroundColor: "#f0f2f5" }}
     >
-      <div className="card shadow p-4" style={{ width: "400px" }}>
-        <h2 className="text-center mb-4">Enterprise CRM Login</h2>
+      <div
+        className="card shadow-lg p-4 border-0 rounded-4"
+        style={{ width: "100%", maxWidth: "420px" }}
+      >
+        <div className="text-center mb-4">
+          <h2 className="fw-bold text-primary mb-1">Enterprise CRM</h2>
+          <p className="text-muted small">Sign in to manage your leads and sales</p>
+        </div>
 
         <form onSubmit={handleLogin}>
           <div className="mb-3">
-            <label>Email</label>
+            <label className="form-label fw-bold small text-secondary">Email Address</label>
             <input
               type="email"
-              className="form-control"
+              className="form-control form-control-lg fs-6"
               placeholder="Enter email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -71,11 +77,11 @@ function Login({ setToken }) {
             />
           </div>
 
-          <div className="mb-3">
-            <label>Password</label>
+          <div className="mb-4">
+            <label className="form-label fw-bold small text-secondary">Password</label>
             <input
               type="password"
-              className="form-control"
+              className="form-control form-control-lg fs-6"
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -84,7 +90,7 @@ function Login({ setToken }) {
           </div>
 
           <button
-            className="btn btn-primary w-100"
+            className="btn btn-primary btn-lg w-100 fw-bold shadow-sm"
             type="submit"
             disabled={loading}
           >
@@ -92,12 +98,13 @@ function Login({ setToken }) {
           </button>
         </form>
 
-        <div className="text-center mt-3 text-muted">
-          Demo Credentials
-          <br />
-          Email: <strong>test@gmail.com</strong>
-          <br />
-          Password: <strong>123456</strong>
+        <div className="text-center mt-4 pt-3 border-top text-muted small">
+          <span>Demo Credentials:</span>
+          <div className="mt-1 bg-light p-2 rounded border">
+            Email: <strong className="text-dark">test@gmail.com</strong>
+            <br />
+            Password: <strong className="text-dark">123456</strong>
+          </div>
         </div>
       </div>
     </div>
