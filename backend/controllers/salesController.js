@@ -4,13 +4,31 @@ const supabase = require("../config/supabase");
 const createSale = async (req, res) => {
   try {
     const { customerName, customerEmail, amount, status, leadId } = req.body;
+    
+    // Support both camelCase and PostgreSQL lowercase column names
+    const salePayload = {
+      customername: customerName,
+      customeremail: customerEmail,
+      amount: Number(amount) || 0,
+      status: status || "Closed",
+      leadid: leadId,
+    };
+
     const { data, error } = await supabase
       .from("sales")
-      .insert([{ customerName, customerEmail, amount: Number(amount) || 0, status: status || "Closed", leadId }])
+      .insert([salePayload])
       .select();
 
     if (error) throw error;
-    res.json({ ...data[0], _id: data[0].id });
+    
+    const s = data[0];
+    res.json({
+      ...s,
+      _id: s.id,
+      customerName: s.customerName || s.customername,
+      customerEmail: s.customerEmail || s.customeremail,
+      leadId: s.leadId || s.leadid,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -25,7 +43,15 @@ const getSales = async (req, res) => {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    const sales = (data || []).map((s) => ({ ...s, _id: s.id }));
+    
+    const sales = (data || []).map((s) => ({
+      ...s,
+      _id: s.id,
+      customerName: s.customerName || s.customername,
+      customerEmail: s.customerEmail || s.customeremail,
+      leadId: s.leadId || s.leadid,
+    }));
+    
     res.json(sales);
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -14,8 +14,9 @@ const {
 // Dashboard Statistics (keep this ABOVE "/:id" routes)
 router.get("/dashboard/stats", getDashboardStats);
 
-// Create Lead
+// Create Lead (support both / and /add endpoints)
 router.post("/", createLead);
+router.post("/add", createLead);
 
 // Get All Leads
 router.get("/", getLeads);

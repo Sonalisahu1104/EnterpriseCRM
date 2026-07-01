@@ -18,7 +18,7 @@ const convertToCustomer = async (req, res) => {
       name: leadData.name,
       email: leadData.email,
       company: leadData.company,
-      sourceLeadId: leadData.id,
+      sourceleadid: leadData.id,
     };
 
     const { data: customerData, error: custError } = await supabase
@@ -28,9 +28,14 @@ const convertToCustomer = async (req, res) => {
 
     if (custError) throw custError;
 
+    const c = customerData[0];
     res.json({
       message: "Converted to customer",
-      customer: { ...customerData[0], _id: customerData[0].id },
+      customer: {
+        ...c,
+        _id: c.id,
+        sourceLeadId: c.sourceLeadId || c.sourceleadid,
+      },
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -46,7 +51,13 @@ const getCustomers = async (req, res) => {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    const customers = (data || []).map((c) => ({ ...c, _id: c.id }));
+    
+    const customers = (data || []).map((c) => ({
+      ...c,
+      _id: c.id,
+      sourceLeadId: c.sourceLeadId || c.sourceleadid,
+    }));
+    
     res.json(customers);
   } catch (err) {
     res.status(500).json({ message: err.message });
