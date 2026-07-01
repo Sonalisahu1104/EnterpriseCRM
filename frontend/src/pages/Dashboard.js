@@ -32,7 +32,6 @@ function Dashboard() {
   const [leads, setLeads] = useState([]);
   const [selectedLead, setSelectedLead] = useState(null);
   const [showAddLead, setShowAddLead] = useState(false);
-  const [refresh, setRefresh] = useState(false);
 
   // ------------------------
   // Fetch Dashboard Stats
@@ -67,10 +66,11 @@ function Dashboard() {
     console.log(err);
   }
 };
-useEffect(() => {
-  fetchLeads();
-  fetchStats();
-}, [refresh]);
+  useEffect(() => {
+    fetchLeads();
+    fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // ------------------------
   // Logout
   // ------------------------
