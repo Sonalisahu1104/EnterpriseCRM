@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../config";
 
 function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -8,7 +9,7 @@ function Customers() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get("https://crmproject-1.onrender.com/api/customers", {
+      const res = await axios.get(`${API_URL}/customers`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -20,7 +21,7 @@ function Customers() {
   };
 
   const deleteCustomer = async (id) => {
-    await axios.delete(`https://crmproject-1.onrender.com/api/customers/${id}`, {
+    await axios.delete(`${API_URL}/customers/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

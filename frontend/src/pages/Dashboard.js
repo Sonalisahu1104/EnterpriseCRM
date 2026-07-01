@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LeadList from "./LeadList";
 import AddLead from "../components/AddLead";
+import API_URL from "../config";
 
 import {
   PieChart,
@@ -39,7 +40,7 @@ function Dashboard() {
   const fetchStats = async () => {
     try {
       const res = await axios.get(
-        "https://crmproject-1.onrender.com/api/leads/dashboard/stats",
+        `${API_URL}/leads/dashboard/stats`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,7 +60,7 @@ function Dashboard() {
   const fetchLeads = async () => {
   try {
     const res = await axios.get(
-      "https://crmproject-1.onrender.com/api/leads"
+      `${API_URL}/leads`
     );
     setLeads(res.data);
   } catch (err) {

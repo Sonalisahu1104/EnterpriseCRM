@@ -1,3 +1,3 @@
-const API_URL = "https://crmproject-1.onrender.com/api";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 export default API_URL;

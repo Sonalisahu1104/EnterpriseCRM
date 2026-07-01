@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import AddLead from "../components/AddLead";
+import API_URL from "../config";
 
 function LeadList({
   leads,
@@ -39,7 +40,7 @@ function LeadList({
 
     try {
       await axios.delete(
-        `https://crmproject-1.onrender.com/api/leads/${id}`,
+        `${API_URL}/leads/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -61,7 +62,7 @@ function LeadList({
   const convertToCustomer = async (id) => {
     try {
       await axios.post(
-        `https://crmproject-1.onrender.com/api/customers/convert/${id}`,
+        `${API_URL}/customers/convert/${id}`,
         {},
         {
           headers: {

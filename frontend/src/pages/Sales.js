@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../config";
 
 function Sales() {
   const [sales, setSales] = useState([]);
@@ -8,7 +9,7 @@ function Sales() {
   const token = localStorage.getItem("token");
 
   const fetchSales = async () => {
-    const res = await axios.get("https://crmproject-1.onrender.com/api/sales", {
+    const res = await axios.get(`${API_URL}/sales`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setSales(res.data);
@@ -16,7 +17,7 @@ function Sales() {
 
   const fetchRevenue = async () => {
     const res = await axios.get(
-      "https://crmproject-1.onrender.com/api/sales/revenue",
+      `${API_URL}/sales/revenue`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     setRevenue(res.data.totalRevenue);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../config";
 
 function AddLead({
   selectedLead,
@@ -43,7 +44,7 @@ function AddLead({
       if (selectedLead) {
         // UPDATE LEAD
         await axios.put(
-          `https://crmproject-1.onrender.com/api/leads/${selectedLead._id}`,
+          `${API_URL}/leads/${selectedLead._id}`,
           lead,
           {
             headers: {
@@ -57,7 +58,7 @@ function AddLead({
       } else {
         // CREATE LEAD
         await axios.post(
-          "https://crmproject-1.onrender.com/api/leads/add",
+          `${API_URL}/leads/add`,
           lead,
           {
             headers: {

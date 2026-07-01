@@ -1,0 +1,18 @@
+# Simple permanent redirect
+[[redirects]]
+  from = "/old-path"
+  to = "/new-path"
+  status = 301
+
+# SPA Catch-All Rewrite for routers
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Forced wildcard redirect to an external URL
+[[redirects]]
+  from = "/blog/*"
+  to = "https://newsite.com"
+  status = 301
+  force = true

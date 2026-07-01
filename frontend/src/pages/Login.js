@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config";
 
 function Login({ setToken }) {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ function Login({ setToken }) {
 
     try {
       const res = await axios.post(
-        "https://crmproject-1.onrender.com/api/auth/login",
+        `${API_URL}/auth/login`,
         {
           email,
           password,
