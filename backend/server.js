@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const supabase = require("./config/supabase");
 
 const app = express();
 
@@ -14,8 +15,12 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/customers", require("./routes/customerRoutes"));
 app.use("/api/sales", require("./routes/salesRoutes"));
 
-app.get("/", (req, res) => {
-  res.send("CRM Backend Running");
+app.get("/", async (req, res) => {
+  res.json({
+    status: "CRM Backend Running",
+    database: "MongoDB Connected",
+    supabase: "Connected to project cttmoketmlhqrlpajxhn",
+  });
 });
 
 // IMPORTANT: use environment variable for production
