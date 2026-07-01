@@ -1,11 +1,18 @@
-const Lead = require("../models/Lead");
+const supabase = require("../config/supabase");
 
 // -------------------------
 // CREATE LEAD
 // -------------------------
 const createLead = async (req, res) => {
   try {
-    const lead = await Lead.create(req.body);
+    const { name, email, phone, company, stage } = req.body;
+    const { data, error } = await supabase
+      .from("leads")
+      .insert([{ name, email, phone, company, stage: stage || "New" }])
+      .select();
+
+    if (error) throw error;
+    const lead = { ...data[0], _id: data[0].id };
     res.status(201).json(lead);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -19,21 +26,30 @@ const getLeads = async (req, res) => {
   try {
     const { search, stage } = req.query;
 
-    let filter = {};
-
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-        { company: { $regex: search, $options: "i" } },
-      ];
-    }
+    let query = supabase
+      .from("leads")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (stage && stage !== "All") {
-      filter.stage = stage;
+      query = query.eq("stage", stage);
     }
 
-    const leads = await Lead.find(filter);
+    const { data, error } = await query;
+    if (error) throw error;
+
+    let leads = (data || []).map((item) => ({ ...item, _id: item.id }));
+
+    if (search) {
+      const term = search.toLowerCase();
+      leads = leads.filter(
+        (l) =>
+          (l.name && l.name.toLowerCase().includes(term)) ||
+          (l.email && l.email.toLowerCase().includes(term)) ||
+          (l.company && l.company.toLowerCase().includes(term))
+      );
+    }
+
     res.json(leads);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -45,13 +61,21 @@ const getLeads = async (req, res) => {
 // -------------------------
 const updateLead = async (req, res) => {
   try {
-    const updatedLead = await Lead.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const id = req.params.id;
+    const { _id, id: removeId, created_at, updated_at, ...updateData } = req.body;
 
-    res.json(updatedLead);
+    const { data, error } = await supabase
+      .from("leads")
+      .update({ ...updateData, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+
+    res.json({ ...data[0], _id: data[0].id });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -62,7 +86,10 @@ const updateLead = async (req, res) => {
 // -------------------------
 const deleteLead = async (req, res) => {
   try {
-    await Lead.findByIdAndDelete(req.params.id);
+    const id = req.params.id;
+    const { error } = await supabase.from("leads").delete().eq("id", id);
+    if (error) throw error;
+
     res.json({ message: "Lead deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -70,21 +97,23 @@ const deleteLead = async (req, res) => {
 };
 
 // -------------------------
-// DASHBOARD STATS (FIXED + SAFE)
+// DASHBOARD STATS
 // -------------------------
 const getDashboardStats = async (req, res) => {
   try {
-    const normalize = (s) => (s || "").toLowerCase();
+    const { data: leads, error } = await supabase.from("leads").select("stage");
+    if (error) throw error;
 
-    const leads = await Lead.find();
+    const normalize = (s) => (s || "").toLowerCase();
+    const list = leads || [];
 
     const stats = {
-      totalLeads: leads.length,
-      newLeads: leads.filter(l => normalize(l.stage) === "new").length,
-      contacted: leads.filter(l => normalize(l.stage) === "contacted").length,
-      qualified: leads.filter(l => normalize(l.stage) === "qualified").length,
-      won: leads.filter(l => normalize(l.stage) === "won").length,
-      lost: leads.filter(l => normalize(l.stage) === "lost").length,
+      totalLeads: list.length,
+      newLeads: list.filter((l) => normalize(l.stage) === "new").length,
+      contacted: list.filter((l) => normalize(l.stage) === "contacted").length,
+      qualified: list.filter((l) => normalize(l.stage) === "qualified").length,
+      won: list.filter((l) => normalize(l.stage) === "won").length,
+      lost: list.filter((l) => normalize(l.stage) === "lost").length,
     };
 
     res.json(stats);
@@ -93,9 +122,6 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
-// -------------------------
-// EXPORT
-// -------------------------
 module.exports = {
   createLead,
   getLeads,

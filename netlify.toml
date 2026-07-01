@@ -1,9 +1,7 @@
 [build]
-  base = "frontend"
-  command = "npm run build"
-  publish = "build"
+  command = "cd frontend && npm install && npm run build"
+  publish = "frontend/build"
 
-# SPA Catch-All Rewrite for routers
 [[redirects]]
   from = "/*"
   to = "/index.html"

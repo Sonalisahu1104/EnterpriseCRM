@@ -1,47 +1,68 @@
-const Customer = require("../models/Customer");
-const Lead = require("../models/Lead");
+const supabase = require("../config/supabase");
 
-// Convert Lead → Customer
+// Convert Lead → Customer in Supabase
 const convertToCustomer = async (req, res) => {
   try {
-    const lead = await Lead.findById(req.params.id);
+    const leadId = req.params.id;
+    const { data: leadData, error: leadError } = await supabase
+      .from("leads")
+      .select("*")
+      .eq("id", leadId)
+      .single();
 
-    if (!lead) {
+    if (leadError || !leadData) {
       return res.status(404).json({ message: "Lead not found" });
     }
 
-    const customer = new Customer({
-      name: lead.name,
-      email: lead.email,
-      company: lead.company,
-      sourceLeadId: lead._id,
+    const newCustomer = {
+      name: leadData.name,
+      email: leadData.email,
+      company: leadData.company,
+      sourceLeadId: leadData.id,
+    };
+
+    const { data: customerData, error: custError } = await supabase
+      .from("customers")
+      .insert([newCustomer])
+      .select();
+
+    if (custError) throw custError;
+
+    res.json({
+      message: "Converted to customer",
+      customer: { ...customerData[0], _id: customerData[0].id },
     });
-
-    await customer.save();
-
-    res.json({ message: "Converted to customer", customer });
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ message: err.message });
   }
 };
 
-// Get all customers
+// Get all customers from Supabase
 const getCustomers = async (req, res) => {
   try {
-    const customers = await Customer.find();
+    const { data, error } = await supabase
+      .from("customers")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    const customers = (data || []).map((c) => ({ ...c, _id: c.id }));
     res.json(customers);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ message: err.message });
   }
 };
 
-// Delete customer
+// Delete customer from Supabase
 const deleteCustomer = async (req, res) => {
   try {
-    await Customer.findByIdAndDelete(req.params.id);
+    const id = req.params.id;
+    const { error } = await supabase.from("customers").delete().eq("id", id);
+    if (error) throw error;
+
     res.json({ message: "Customer deleted" });
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ message: err.message });
   }
 };
 
